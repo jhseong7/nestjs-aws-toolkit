@@ -1,0 +1,23 @@
+{
+  "name": "@jhseong7/nestjs-aws-toolkit",
+  "version": "0.0.1",
+  "description": "A NestJS module that provides methods and providers to easily utilize AWS SDK's methods",
+  "main": "dist/index.js",
+  "repository": "https://github.com/jhseong7/nestjs-aws-toolkit",
+  "author": "jhseong7",
+  "license": "MIT",
+  "private": false,
+  "scripts": {
+    "build": "tsc -p tsconfig.json"
+  },
+  "devDependencies": {
+    "@types/node": "^22.5.1",
+    "typescript": "^5.5.4"
+  },
+  "dependencies": {
+    "@aws-sdk/client-sqs": "^3.637.0",
+    "@nestjs/common": "^10.4.1",
+    "@nestjs/config": "^3.2.3",
+    "class-validator": "^0.14.1"
+  }
+}
