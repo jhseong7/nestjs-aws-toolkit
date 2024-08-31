@@ -1,5 +1,4 @@
 import { DynamicModule, Module, Provider } from "@nestjs/common";
-
 import { ConfigModule } from "@nestjs/config";
 
 import { AwsSqsQueue } from "./sqs.queue";
@@ -11,12 +10,11 @@ import {
   IAwsSqsModuleOptions,
 } from "./sqs.type";
 import {
-  ICommonOptionsHolder,
-  createCommonOptionsHolder,
   getSqsQueueOptionsToken,
   getSqsQueueToken,
   getSqsRootOptionsToken,
 } from "./sqs.utils";
+import { createOptionsProvider, ICommonOptionsHolder } from "../utils/token";
 
 // NOTE: how forRootAsync dynamic module works ref: https://github.com/nestjs/typeorm/blob/master/lib/typeorm-core.module.ts#L154
 @Module({})
@@ -65,9 +63,7 @@ class AwsSqsModule {
       | IAwsSqsFeatureModuleAsyncOptions[]
   ): Provider[] {
     // Provider for the commons config
-    const commonConfigHolder = createCommonOptionsHolder(
-      getSqsRootOptionsToken()
-    );
+    const commonConfigHolder = createOptionsProvider(getSqsRootOptionsToken());
 
     const optionsList = Array.isArray(options) ? options : [options];
 
@@ -186,7 +182,7 @@ class AwsSqsModule {
     const baseModuleProvider = baseModule.providers || [];
 
     // Providers for common options from the forRoot
-    const commonConfigHolder = createCommonOptionsHolder<IAwsSqsModuleOptions>(
+    const commonConfigHolder = createOptionsProvider<IAwsSqsModuleOptions>(
       getSqsRootOptionsToken()
     );
 
