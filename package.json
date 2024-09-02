@@ -1,6 +1,6 @@
 {
   "name": "@jhseong7/nestjs-aws-toolkit",
-  "version": "0.0.2",
+  "version": "0.0.1",
   "description": "A NestJS module that provides methods and providers to easily utilize AWS SDK's methods",
   "main": "dist/index.js",
   "repository": "https://github.com/jhseong7/nestjs-aws-toolkit",
