@@ -8,7 +8,7 @@ import {
   SendMessageBatchResult,
   SendMessageCommand,
 } from "@aws-sdk/client-sqs";
-import { Logger } from "@nestjs/common";
+import { Logger, OnApplicationShutdown } from "@nestjs/common";
 import {
   AwsSqsModuleOptions,
   AwsSqsReceiveMessageResponse,
@@ -17,7 +17,11 @@ import {
 
 const MAX_BATCH_SIZE = 10;
 
-class AwsSqsQueue {
+/**
+ * The actual queue class to interact with the AWS SQS
+ * If the same queue name is provided, the same queue instance will be returned to the requested module
+ */
+class AwsSqsQueue implements OnApplicationShutdown {
   private readonly logger = new Logger(AwsSqsQueue.name);
 
   private readonly client: SQSClient;
@@ -71,11 +75,20 @@ class AwsSqsQueue {
   }
 
   /**
+   * Get the SQS client instance for direct access
+   * @returns The SQS client instance
+   */
+  public getClient(): SQSClient {
+    return this.client;
+  }
+
+  /**
    * Destroy the client on shutdown
    * @returns
    */
-  public onShutdown() {
-    return this.client.destroy();
+  public onApplicationShutdown(signal?: string) {
+    this.logger.log(`Shutting down SQS client due to ${signal}`);
+    this.client.destroy();
   }
 
   /**
