@@ -7,13 +7,13 @@ import {
   SendMessageBatchRequestEntry,
   SendMessageBatchResult,
   SendMessageCommand,
-} from "@aws-sdk/client-sqs";
-import { Logger, OnApplicationShutdown } from "@nestjs/common";
+} from '@aws-sdk/client-sqs';
+import { Logger, OnApplicationShutdown } from '@nestjs/common';
 import {
   AwsSqsModuleOptions,
   AwsSqsReceiveMessageResponse,
   IAwsSqsModuleOptions,
-} from "./sqs.type";
+} from './sqs.type';
 
 const MAX_BATCH_SIZE = 10;
 
@@ -33,25 +33,16 @@ class AwsSqsQueue implements OnApplicationShutdown {
   constructor(options: IAwsSqsModuleOptions) {
     // Check if the required options are provided
     if (!AwsSqsModuleOptions.validate(options)) {
-      this.logger.error("Invalid options provided");
-      throw new Error("Invalid options provided");
+      this.logger.error('Invalid options provided');
+      throw new Error('Invalid options provided');
     }
 
-    const {
-      region,
-      accessKeyId,
-      secretAccessKey,
-      apiVersion,
-      sqsQueueUrl,
-      messageGroupId,
-    } = options;
+    const { region, credentials, apiVersion, sqsQueueUrl, messageGroupId } =
+      options;
 
     const sqsConfig: SQSClientConfig = {
       region,
-      credentials: {
-        accessKeyId,
-        secretAccessKey,
-      },
+      credentials,
       apiVersion,
     };
 
@@ -67,7 +58,7 @@ class AwsSqsQueue implements OnApplicationShutdown {
   private _getDefaultQueueUrl() {
     if (!this.defaultQueueUrl) {
       throw new Error(
-        "Default queue url is not provided. You must provide at least one queue url"
+        'Default queue url is not provided. You must provide at least one queue url'
       );
     }
 
@@ -108,7 +99,7 @@ class AwsSqsQueue implements OnApplicationShutdown {
     } = param;
 
     // Prepare the body
-    const messageBody = typeof body === "string" ? body : JSON.stringify(body);
+    const messageBody = typeof body === 'string' ? body : JSON.stringify(body);
 
     const command = new SendMessageCommand({
       MessageBody: messageBody,
@@ -147,17 +138,17 @@ class AwsSqsQueue implements OnApplicationShutdown {
     const batchRequestEntryList: SendMessageBatchRequestEntry[][] = [];
     for (let i = 0; i < bodyList.length; i += MAX_BATCH_SIZE) {
       batchRequestEntryList.push(
-        bodyList.slice(i, i + MAX_BATCH_SIZE).map((body) => ({
-          Id: "id_" + dateNow,
-          MessageBody: typeof body === "string" ? body : JSON.stringify(body),
-          MessageDeduplicationId: "deduplication_id_" + dateNow,
+        bodyList.slice(i, i + MAX_BATCH_SIZE).map(body => ({
+          Id: 'id_' + dateNow,
+          MessageBody: typeof body === 'string' ? body : JSON.stringify(body),
+          MessageDeduplicationId: 'deduplication_id_' + dateNow,
           MessageGroupId: messageGroupId ?? this.defaultMessageGroupId,
         }))
       );
     }
 
     const commandBatch = batchRequestEntryList.map(
-      (requestEntryList) =>
+      requestEntryList =>
         new SendMessageBatchCommand({
           QueueUrl: queueUrl,
           Entries: requestEntryList,
@@ -211,7 +202,7 @@ class AwsSqsQueue implements OnApplicationShutdown {
     const command = new ReceiveMessageCommand({
       QueueUrl: queueUrl,
       MaxNumberOfMessages: maxNumberOfMessages,
-      MessageAttributeNames: ["All"],
+      MessageAttributeNames: ['All'],
       VisibilityTimeout: visibilityTimeout,
       WaitTimeSeconds: waitTimeSeconds,
     });
@@ -220,10 +211,10 @@ class AwsSqsQueue implements OnApplicationShutdown {
 
     if (!response.Messages) return null;
 
-    const messages = response.Messages.flatMap((message) => {
+    const messages = response.Messages.flatMap(message => {
       let body: T;
       try {
-        if (!message.Body) throw new Error("Message body is invalid");
+        if (!message.Body) throw new Error('Message body is invalid');
 
         body = JSON.parse(message.Body) as T;
       } catch (e) {
@@ -250,7 +241,7 @@ class AwsSqsQueue implements OnApplicationShutdown {
 
     return {
       messages,
-      onProcessComplete: async (receiptHandles) =>
+      onProcessComplete: async receiptHandles =>
         this.deleteMessages(receiptHandles, queueUrl),
     };
   }
@@ -266,7 +257,7 @@ class AwsSqsQueue implements OnApplicationShutdown {
       Entries: receiptHandleList.map((handle, index) => ({
         // only leave alphanumeric characters in handle and shrink to 60 characters
         Id: `delete_${index}_${handle
-          .replace(/[^a-zA-Z0-9]/g, "")
+          .replace(/[^a-zA-Z0-9]/g, '')
           .slice(0, 60)}`,
         ReceiptHandle: handle,
       })),

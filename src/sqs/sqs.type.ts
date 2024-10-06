@@ -1,9 +1,11 @@
-import { IsOptional, IsString, validateSync } from "class-validator";
+import { IsObject, IsOptional, IsString, validateSync } from 'class-validator';
 
 type IAwsSqsModuleOptions = {
   region?: string;
-  accessKeyId: string;
-  secretAccessKey: string;
+  credentials?: {
+    accessKeyId: string;
+    secretAccessKey: string;
+  };
   apiVersion?: string;
   sqsQueueUrl?: string;
   messageGroupId?: string;
@@ -24,7 +26,7 @@ type IAwsSqsFeatureModuleOptions = Partial<IAwsSqsModuleOptions> & {
 
 type IAwsSqsFeatureModuleAsyncOptions = Omit<
   IAwsSqsModuleAsyncOptions,
-  "useFactory"
+  'useFactory'
 > & {
   // Alias name to call the queue settings
   queueName: string;
@@ -39,8 +41,7 @@ type IAwsSqsFeatureModuleAsyncOptions = Omit<
 export class AwsSqsModuleOptions implements IAwsSqsModuleOptions {
   constructor(options: IAwsSqsModuleOptions) {
     this.region = options.region;
-    this.accessKeyId = options.accessKeyId;
-    this.secretAccessKey = options.secretAccessKey;
+    this.credentials = options.credentials;
     this.apiVersion = options.apiVersion;
     this.sqsQueueUrl = options.sqsQueueUrl;
     this.messageGroupId = options.messageGroupId;
@@ -52,7 +53,7 @@ export class AwsSqsModuleOptions implements IAwsSqsModuleOptions {
     const errors = validateSync(inst);
 
     if (errors.length > 0) {
-      throw new Error(errors.join(", ").toString());
+      throw new Error(errors.join(', ').toString());
     }
 
     return true;
@@ -64,13 +65,15 @@ export class AwsSqsModuleOptions implements IAwsSqsModuleOptions {
   }
 
   @IsString()
+  @IsOptional()
   region?: string;
 
-  @IsString()
-  accessKeyId: string;
-
-  @IsString()
-  secretAccessKey: string;
+  @IsObject()
+  @IsOptional()
+  credentials?: {
+    accessKeyId: string;
+    secretAccessKey: string;
+  };
 
   @IsString()
   @IsOptional()
