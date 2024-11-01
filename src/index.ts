@@ -1,1 +1,2 @@
-export * from "./sqs";
+export * from './sqs';
+export * from './s3';

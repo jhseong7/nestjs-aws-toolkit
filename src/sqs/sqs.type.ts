@@ -1,4 +1,5 @@
 import { IsObject, IsOptional, IsString, validateSync } from 'class-validator';
+import { IModuleAsyncOptionBase } from '../common';
 
 type IAwsSqsModuleOptions = {
   region?: string;
@@ -11,12 +12,7 @@ type IAwsSqsModuleOptions = {
   messageGroupId?: string;
 };
 
-type IAwsSqsModuleAsyncOptions = {
-  useFactory: (
-    ...args: any[]
-  ) => Promise<IAwsSqsModuleOptions> | IAwsSqsModuleOptions;
-  inject?: any[];
-};
+type IAwsSqsModuleAsyncOptions = IModuleAsyncOptionBase<IAwsSqsModuleOptions>;
 
 // NOTE: inherit as partial so any unprovided options will be inherited from the root module
 type IAwsSqsFeatureModuleOptions = Partial<IAwsSqsModuleOptions> & {
