@@ -1,20 +1,20 @@
-import { DynamicModule, Module, Provider } from "@nestjs/common";
-import { ConfigModule } from "@nestjs/config";
+import { DynamicModule, Module, Provider } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 
-import { AwsSqsQueue } from "./sqs.queue";
+import { AwsSqsQueue } from './sqs.queue';
 import {
   AwsSqsModuleOptions,
   IAwsSqsFeatureModuleAsyncOptions,
   IAwsSqsFeatureModuleOptions,
   IAwsSqsModuleAsyncOptions,
   IAwsSqsModuleOptions,
-} from "./sqs.type";
+} from './sqs.type';
 import {
   getSqsQueueOptionsToken,
   getSqsQueueToken,
   getSqsRootOptionsToken,
-} from "./sqs.utils";
-import { createOptionsProvider, ICommonOptionsHolder } from "../utils/token";
+} from './sqs.utils';
+import { createOptionsProvider, ICommonOptionsHolder } from '../utils/token';
 
 // NOTE: how forRootAsync dynamic module works ref: https://github.com/nestjs/typeorm/blob/master/lib/typeorm-core.module.ts#L154
 @Module({})
@@ -68,7 +68,7 @@ class AwsSqsModule {
     const optionsList = Array.isArray(options) ? options : [options];
 
     // Providers to provide the async options value for the queue provider below
-    const optionsProviderList: Provider[] = optionsList.map((option) => ({
+    const optionsProviderList: Provider[] = optionsList.map(option => ({
       provide: getSqsQueueOptionsToken(option.queueName),
       useFactory: async (...args) => {
         const value = await option.useFactory(...args);
@@ -79,7 +79,7 @@ class AwsSqsModule {
     }));
 
     // Providers to provide the injected queue for @InjectSqsQueue
-    const queueProviderList: Provider[] = optionsList.map((option) => ({
+    const queueProviderList: Provider[] = optionsList.map(option => ({
       provide: getSqsQueueToken(option.queueName),
       useFactory: async (
         configHolder: ICommonOptionsHolder<IAwsSqsModuleOptions>,
@@ -100,7 +100,7 @@ class AwsSqsModule {
    * @param options - The options
    * @returns - The module
    */
-  static forRoot(options: IAwsSqsModuleOptions): DynamicModule {
+  public static forRoot(options: IAwsSqsModuleOptions): DynamicModule {
     const baseModule = AwsSqsModule.getBaseModuleOptions();
     const baseModuleProvider = baseModule.providers || [];
 
@@ -125,7 +125,9 @@ class AwsSqsModule {
    * @param asyncOptions - The async options
    * @returns - The module
    */
-  static forRootAsync(asyncOptions: IAwsSqsModuleAsyncOptions): DynamicModule {
+  public static forRootAsync(
+    asyncOptions: IAwsSqsModuleAsyncOptions
+  ): DynamicModule {
     const baseModule = AwsSqsModule.getBaseModuleOptions();
     const baseModuleProvider = baseModule.providers || [];
 
@@ -148,7 +150,7 @@ class AwsSqsModule {
    * @param asyncOptions - The async options
    * @returns - The module
    */
-  static registerQueueAsync(
+  public static registerQueueAsync(
     asyncOptions:
       | IAwsSqsFeatureModuleAsyncOptions
       | IAwsSqsFeatureModuleAsyncOptions[]
@@ -175,7 +177,7 @@ class AwsSqsModule {
    * @param asyncOptions - The options
    * @returns - The module
    */
-  static registerQueue(
+  public static registerQueue(
     options: IAwsSqsFeatureModuleOptions | IAwsSqsFeatureModuleOptions[]
   ): DynamicModule {
     const baseModule = AwsSqsModule.getBaseModuleOptions();
@@ -189,7 +191,7 @@ class AwsSqsModule {
     const optionsList = Array.isArray(options) ? options : [options];
 
     // Queue providers for the @InjectSqsQueue decorator
-    const queueProviders: Provider[] = optionsList.map((option) => ({
+    const queueProviders: Provider[] = optionsList.map(option => ({
       provide: getSqsQueueToken(option.queueName),
       useFactory: async (
         configHolder: ICommonOptionsHolder<IAwsSqsModuleOptions>

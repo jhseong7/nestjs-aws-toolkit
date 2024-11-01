@@ -1,6 +1,5 @@
-import { Inject, Optional, Type, mixin } from "@nestjs/common";
-import { SqsConstant } from "./sqs.constant";
-import { mergeTokens } from "../utils/token";
+import { SqsConstant } from './sqs.constant';
+import { mergeTokens } from '../utils/token';
 
 /**
  * Function to generate the queue token for the sqs queue module provider
