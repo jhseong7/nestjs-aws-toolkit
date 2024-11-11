@@ -15,7 +15,7 @@ Case 1: Sync init
 
 ```ts
 import { Module } from '@nestjs/common';
-import { AwsSqsModule } from '@pala-libs/aws';
+import { AwsSqsModule } from '@jhseong7/nestjs-aws-toolkit';
 
 @Module({
   imports: [
@@ -35,27 +35,27 @@ export class AppModule {}
 Case 2: Async Init
 
 ```ts
-import { Module } from "@nestjs/common";
-import { AwsSqsModule } from "@pala-libs/aws";
+import { Module } from '@nestjs/common';
+import { AwsSqsModule } from '@jhseong7/nestjs-aws-toolkit';
 
 @Module({
   imports: [
     AwsSqsModule.forRootAsync({
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
-        region: configService.getOrThrow<string>("AWS_SQS_REGION"),
-        accessKeyId: configService.getOrThrow<string>("AWS_SQS_ACCESS_KEY_ID"),
+        region: configService.getOrThrow<string>('AWS_SQS_REGION'),
+        accessKeyId: configService.getOrThrow<string>('AWS_SQS_ACCESS_KEY_ID'),
         secretAccessKey: configService.getOrThrow<string>(
-          "AWS_SQS_SECRET_ACCESS_KEY"
+          'AWS_SQS_SECRET_ACCESS_KEY'
         ),
         apiVersion: configService.getOrThrow<string>(
-          "AWS_SQS_API_VERSION",
-          "2012-11-05"
+          'AWS_SQS_API_VERSION',
+          '2012-11-05'
         ),
         messageGroupId: configService.get<string>(
-          "AWS_SQS_MESSAGE_DEFAULT_GROUP_ID"
+          'AWS_SQS_MESSAGE_DEFAULT_GROUP_ID'
         ),
-        sqsQueueUrl: configService.get<string>("AWS_SQS_DEFAULT_QUEUE_URL"),
+        sqsQueueUrl: configService.get<string>('AWS_SQS_DEFAULT_QUEUE_URL'),
       }),
     }),
   ],
@@ -68,13 +68,13 @@ Then for any new queue to use in your service should be declared in you module l
 case 1: sync init
 
 ```ts
-import { Module } from "@nestjs/common";
-import { AwsSqsModule } from "@pala-libs/aws";
+import { Module } from '@nestjs/common';
+import { AwsSqsModule } from '@jhseong7/nestjs-aws-toolkit';
 
 @Module({
   imports: [
     AwsSqsModule.registerQueue({
-      queueName: "sample-queue",
+      queueName: 'sample-queue',
       sqsQueueUrl: process.env.SAMPLE_SQS_QUEUE_URL_FOR_FEATURE,
     }),
   ],
@@ -87,17 +87,17 @@ case 2: async init
 Getting configs from injected params are also possible
 
 ```ts
-import { Module } from "@nestjs/common";
-import { AwsSqsModule } from "@pala-libs/aws";
+import { Module } from '@nestjs/common';
+import { AwsSqsModule } from '@jhseong7/nestjs-aws-toolkit';
 
 @Module({
   imports: [
     AwsSqsModule.registerQueueAsync({
-      queueName: "sample-queue",
+      queueName: 'sample-queue',
       useFactory: async (configService: ConfigService) => {
         return {
           sqsQueueUrl: configService.getOrThrow<string>(
-            "SAMPLE_SQS_QUEUE_URL_FOR_FEATURE"
+            'SAMPLE_SQS_QUEUE_URL_FOR_FEATURE'
           ),
         };
       },
@@ -111,43 +111,43 @@ export class SomeModule {}
 Arrays can also be provided for bulk initialization
 
 ```ts
-import { Module } from "@nestjs/common";
-import { AwsSqsModule } from "@pala-libs/aws";
+import { Module } from '@nestjs/common';
+import { AwsSqsModule } from '@jhseong7/nestjs-aws-toolkit';
 
 @Module({
   imports: [
     AwsSqsModule.registerQueue([
       {
-        queueName: "queue1",
-        sqsQueueUrl: "test1",
+        queueName: 'queue1',
+        sqsQueueUrl: 'test1',
       },
       {
-        queueName: "queue2",
-        sqsQueueUrl: "test2",
+        queueName: 'queue2',
+        sqsQueueUrl: 'test2',
       },
       {
-        queueName: "queue3",
-        sqsQueueUrl: "test3",
+        queueName: 'queue3',
+        sqsQueueUrl: 'test3',
       },
     ]),
     AwsSqsModule.registerQueueAsync([
       {
-        queueName: "sample-queue",
+        queueName: 'sample-queue',
         useFactory: async (configService: ConfigService) => {
           return {
             sqsQueueUrl: configService.getOrThrow<string>(
-              "SAMPLE_SQS_QUEUE_URL_FOR_FEATURE"
+              'SAMPLE_SQS_QUEUE_URL_FOR_FEATURE'
             ),
           };
         },
         inject: [ConfigService],
       },
       {
-        queueName: "sample-queue2",
+        queueName: 'sample-queue2',
         useFactory: async (configService: ConfigService) => {
           return {
             sqsQueueUrl: configService.getOrThrow<string>(
-              "SAMPLE_SQS_QUEUE_URL_FOR_FEATURE2"
+              'SAMPLE_SQS_QUEUE_URL_FOR_FEATURE2'
             ),
           };
         },
@@ -162,12 +162,12 @@ export class SomeModule {}
 The to use the queue, use the `@InjectSqsQueue(queueName: string)` decorator to inject the queue `AwsSqsQueue` to your injectable class.
 
 ```ts
-import { AwsSqsQueue, InjectSqsQueue } from "@pala-libs/aws";
+import { AwsSqsQueue, InjectSqsQueue } from '@jhseong7/nestjs-aws-toolkit';
 
 @Injectable()
 class SomeService {
   constructor(
-    @InjectSqsQueue("sample-queue") private readonly sqsQueue: AwsSqsQueue
+    @InjectSqsQueue('sample-queue') private readonly sqsQueue: AwsSqsQueue
   ) {}
 }
 ```
@@ -175,16 +175,16 @@ class SomeService {
 Multiple injections are also supported
 
 ```ts
-import { AwsSqsQueue, InjectSqsQueue } from "@pala-libs/aws";
+import { AwsSqsQueue, InjectSqsQueue } from '@jhseong7/nestjs-aws-toolkit';
 
 @Injectable()
 class SomeService {
   constructor(
-    @InjectSqsQueue("queue1") private readonly sqsQueue: AwsSqsQueue,
-    @InjectSqsQueue("queue2") private readonly sqsQueue2: AwsSqsQueue,
-    @InjectSqsQueue("queue3") private readonly sqsQueue3: AwsSqsQueue,
-    @InjectSqsQueue("sample-queue") private readonly sqsQueue4: AwsSqsQueue,
-    @InjectSqsQueue("sample-queue2") private readonly sqsQueue5: AwsSqsQueue
+    @InjectSqsQueue('queue1') private readonly sqsQueue: AwsSqsQueue,
+    @InjectSqsQueue('queue2') private readonly sqsQueue2: AwsSqsQueue,
+    @InjectSqsQueue('queue3') private readonly sqsQueue3: AwsSqsQueue,
+    @InjectSqsQueue('sample-queue') private readonly sqsQueue4: AwsSqsQueue,
+    @InjectSqsQueue('sample-queue2') private readonly sqsQueue5: AwsSqsQueue
   ) {}
 }
 ```
